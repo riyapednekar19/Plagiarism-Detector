@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plagiarism Detector & Report Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 🌐 FORCED VISIBLE TOP SYSTEM NAVBAR -->
+<header class="top-navbar" style="display: flex !important; visibility: visible !important; position: sticky; top: 0; z-index: 9999; background: #ffffff; border-bottom: 1px solid #cbd5e1; width: 100%;">
+    <div class="nav-container" style="width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: 65px;">
+
+        <!-- Navigation Links -->
+        <nav class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+            <a href="javascript:void(0)" class="nav-item active" onclick="switchMainTab('home')" style="text-decoration: none; color: #0284c7; font-weight: 500; padding: 8px 12px; border-radius: 6px;">
+                🏠 Home
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('history-view')" style="text-decoration: none; color: #64748b; font-weight: 500; padding: 8px 12px; border-radius: 6px;">
+                📁 History
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('about-view')" style="text-decoration: none; color: #64748b; font-weight: 500; padding: 8px 12px; border-radius: 6px;">
+                ℹ️ About Us
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('help-view')" style="text-decoration: none; color: #64748b; font-weight: 500; padding: 8px 12px; border-radius: 6px;">
+                ❓ Help
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('contact-view')" style="text-decoration: none; color: #64748b; font-weight: 500; padding: 8px 12px; border-radius: 6px;">
+                📞 Contact Us
+            </a>
+        </nav>
+
+        <!-- Right Controls Area (Theme Toggle & User Menu) -->
+        <div class="nav-controls" style="display: flex; align-items: center; gap: 12px;">
+            <div class="user-dropdown" style="position: relative; display: inline-block;">
+                <button class="user-dropdown-btn" onclick="toggleLogoMenu(event)" style="display: flex; align-items: center; gap: 8px; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer;">
+                    👤 Guest Explorer ▾
+                </button>
+                <div id="logoDropdownMenu" class="logo-dropdown-content" style="display: none; position: absolute; right: 0; top: 110%; background: white; min-width: 200px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; border: 1px solid #e2e8f0; z-index: 10000; padding: 5px 0;">
+                    <a href="javascript:void(0)" onclick="switchMainTab('home')" style="display: block; padding: 10px 16px; color: #334155; text-decoration: none;">🏠 Home (Dashboard)</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('history-view')" style="display: block; padding: 10px 16px; color: #334155; text-decoration: none;">📁 History</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('about-view')" style="display: block; padding: 10px 16px; color: #334155; text-decoration: none;">ℹ️ About Us</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('help-view')" style="display: block; padding: 10px 16px; color: #334155; text-decoration: none;">❓ Help & FAQs</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('contact-view')" style="display: block; padding: 10px 16px; color: #334155; text-decoration: none;">📞 Contact Us</a>
+                </div>
+            </div>
+
+            <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme" style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 50%; cursor: pointer;">
+                🌙
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- SPLASH SCREEN OVERLAY -->
+<div id="splash-screen">
+
+    <!-- Top Blue Accent Bar -->
+    <div class="top-bar"></div>
+
+    <!-- Visible Bottom Background Waves -->
+    <svg class="bg-wave wave-bottom-dark" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <path fill="rgba(2, 132, 199, 0.1)" d="M0,192L48,186.7C96,181,192,171,288,181.3C384,192,480,224,576,218.7C672,213,768,171,864,165.3C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+    </svg>
+    <svg class="bg-wave wave-bottom-light" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <path fill="rgba(2, 132, 199, 0.05)" fill-opacity="0.6" d="M0,256L48,240C96,224,192,192,288,181.3C384,171,480,181,576,202.7C672,224,768,256,864,240C960,224,1056,160,1152,144C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+    </svg>
+
+    <!-- Main Splash Screen Inner Grid -->
+    <div class="splash-container">
+
+        <!-- LEFT COLUMN: Content & Details -->
+        <div class="splash-content">
+
+            <!-- Brand Header (Shield Icon Beside Title) -->
+            <div class="brand-header">
+                <svg class="shield-logo" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="32" y="30" width="28" height="36" rx="3" fill="#0284C7"/>
+                    <line x1="38" y1="40" x2="54" y2="40" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="38" y1="47" x2="54" y2="47" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="38" y1="54" x2="48" y2="54" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="60" cy="56" r="10" fill="#38BDF8"/>
+                    <path d="M57 56L59 58L63 54" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+
+                <div class="splash-title">
+                    <span class="title-primary">Plagiarism</span>
+                    <span class="title-secondary">Detector</span>
+                </div>
+            </div>
+
+            <!-- Tagline & Description -->
+            <h3 class="splash-tagline">Check. Compare. Ensure Originality.</h3>
+            <p class="splash-description">
+                Detect plagiarism in text and documents with advanced similarity analysis and AI-powered checks.
+            </p>
+
+            <!-- Get Started Button (ID matches JavaScript handler) -->
+            <div class="action-container">
+                <button id="btn-splash-get-started" class="btn-get-started" onclick="dismissSplashAndShowLogin()">
+                    Get Started
+                    <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Splash Accent Line Divider -->
+            <div class="splash-divider"></div>
+
+            <!-- Authors / Credits -->
+
+
+        </div>
+
+        <!-- RIGHT COLUMN: Graphic Illustration -->
+        <div class="splash-illustration">
+            <!-- Darker Backing Blob Shape behind papers -->
+            <div class="illustration-backdrop"></div>
+
+            <div class="cards-container">
+                <!-- Document 1 (Left - Clean) -->
+                <div class="doc-card card-left">
+                    <div class="doc-line line-blue w-60"></div>
+                    <div class="doc-line line-light w-80"></div>
+                    <div class="doc-line line-gray w-100"></div>
+                    <div class="doc-line line-box"></div>
+                    <div class="doc-line line-gray w-90"></div>
+                    <div class="doc-line line-gray w-75"></div>
+                </div>
+
+                <!-- Document 2 (Right - Plagiarized) -->
+                <div class="doc-card card-right">
+                    <div class="badge-cancel">✕</div>
+                    <div class="doc-line line-red w-70"></div>
+                    <div class="doc-line line-red-highlight"></div>
+                    <div class="doc-line line-gray w-80"></div>
+                    <div class="doc-line line-red-highlight"></div>
+                    <div class="doc-line line-gray w-60"></div>
+                </div>
+
+                <!-- Magnifying Glass -->
+                <div class="glass-illustration">
+                    <div class="glass-lens"></div>
+                    <div class="glass-handle"></div>
+                </div>
+
+                <!-- Verified Check Badge -->
+                <div class="badge-verified-wrapper">
+                    <div class="badge-verified">
+                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Similarity Badge Widget -->
+                <div class="similarity-card">
+                    <span class="sim-label">Similarity</span>
+                    <span class="sim-value">32%</span>
+                    <div class="sim-progress-bg"><div class="sim-progress-bar"></div></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="login-screen">
+    <div class="auth-wrapper">
+
+        <!-- LOGIN CARD -->
+        <div id="login-card" class="auth-card">
+            <h2 class="auth-title">Login</h2>
+
+            <!-- Converted from <div> to <form> -->
+            <form class="auth-form" id="login-form" onsubmit="handleLogin(event); return false;">
+                <div class="auth-input-group">
+                    <input type="email" id="login-email" placeholder="Email" required>
+                </div>
+                <div class="auth-input-group password-toggle-wrapper">
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <span class="password-visible-icon" onclick="togglePasswordVisibility('login-password')">👁️</span>
+                </div>
+                <div class="auth-options-row">
+                    <a href="#" class="auth-link-muted" onclick="alert('Password reset link sent to your email.'); return false;">Forgot Password?</a>
+                </div>
+                <!-- Set type="submit" and added id="btn-submit-login" -->
+                <button type="submit" id="btn-submit-login" class="auth-primary-btn">Login</button>
+<!--                <button type="submit" class="auth-primary-btn">Login</button>-->
+                <p class="auth-switch-text">
+                    Don't have an account? <a href="#" onclick="switchAuthForm('signup'); return false;">Sign up</a>
+                </p>
+            </form>
+
+            <!-- GUEST EXPLORE LINK INSIDE CARD -->
+            <p class="auth-guest-text">
+                Just want to explore?
+                <a href="javascript:void(0)" id="btn-bypass-auth" onclick="bypassAuthAndStart(event)" class="guest-link">Get Started for Free &rarr;</a>
+            </p>
+        </div>
+
+        <!-- SIGNUP CARD -->
+        <div id="signup-card" class="auth-card hidden">
+            <h2 class="auth-title">Create Account</h2>
+
+            <div class="role-toggle-container">
+                <!-- Populated dynamically via JS if needed -->
+            </div>
+
+            <!-- Converted from <div> to <form> -->
+            <form class="auth-form" id="signup-form" onsubmit="handleSignUp(event); return false;">
+                <div class="auth-input-group">
+                    <input type="text" id="signup-name" placeholder="Full Name" required>
+                </div>
+                <div class="auth-input-group">
+                    <input type="email" id="signup-email" placeholder="Email Address" required>
+                </div>
+                <div class="auth-input-group password-toggle-wrapper">
+                    <input type="password" id="signup-password" placeholder="Password" required>
+                    <span class="password-visible-icon" onclick="togglePasswordVisibility('signup-password')">👁️</span>
+                </div>
+                <!-- Set type="submit" and added id="btn-submit-signup" -->
+                <button type="submit" id="btn-submit-signup" class="auth-primary-btn">Sign Up</button>
+                <p class="auth-switch-text">
+                    Already have an account? <a href="#" onclick="switchAuthForm('login'); return false;">Login</a>
+                </p>
+            </form>
+
+            <!-- GUEST EXPLORE LINK INSIDE CARD -->
+            <p class="auth-guest-text">
+                Just want to explore?
+                <a href="javascript:void(0)" onclick="bypassAuthAndStart(event)" class="guest-link">Get Started for Free &rarr;</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+</div> <!-- End of Login Screen -->
+
+<!-- 🌐 ENHANCED TOP SYSTEM NAVBAR (MOVE THIS HERE SO IT SHOWS) -->
+<header class="top-navbar">
+    <div class="nav-container">
+        <!-- Navigation Links -->
+        <nav class="nav-links">
+            <a href="javascript:void(0)" class="nav-item active" onclick="switchMainTab('home')">
+                <span class="nav-icon">🏠</span> Home
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('history-view')">
+                <span class="nav-icon">📁</span> History
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('about-view')">
+                <span class="nav-icon">ℹ️</span> About Us
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('help-view')">
+                <span class="nav-icon">❓</span> Help
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchMainTab('contact-view')">
+                <span class="nav-icon">📞</span> Contact Us
+            </a>
+        </nav>
+
+        <!-- Right Controls Area -->
+        <div class="nav-controls">
+            <!-- User Dropdown Pill -->
+            <div class="user-dropdown">
+                <button class="user-dropdown-btn" onclick="toggleLogoMenu(event)">
+                    <span class="user-icon">👤</span>
+                    <span class="user-name">Guest Explorer</span>
+                    <span class="dropdown-arrow">▾</span>
+                </button>
+                <div id="logoDropdownMenu" class="logo-dropdown-content">
+                    <a href="javascript:void(0)" onclick="switchMainTab('home')">🏠 Home (Dashboard)</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('history-view')">📁 History</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('about-view')">ℹ️ About Us (Creators)</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('help-view')">❓ Help & System FAQs</a>
+                    <a href="javascript:void(0)" onclick="switchMainTab('contact-view')">📞 Contact Us Support</a>
+                </div>
+            </div>
+
+            <!-- Dark / Light Theme Toggle Pill -->
+            <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<div id="workspace-screen">
+
+
+    <!-- ==========================================================
+         HOME MAIN TAB LAYER CONTAINER (Dashboard UI)
+         ========================================================== -->
+    <div id="home" class="tab-layer active">
+
+        <div class="dashboard-header">
+            <div>
+                <h1 style="margin: 0; font-size: 1.8rem; color: var(--accent-blue);">System Workspace</h1>
+            </div>
+            <div>
+                <button style="background: var(--accent-red); border:none; padding:8px 15px; border-radius:4px; font-weight:bold; color: white; cursor:pointer;" onclick="location.reload()">Terminate Session</button>
+            </div>
+        </div>
+        <!-- =========================================================
+             SYSTEM WORKSPACE
+             ========================================================= -->
+
+        <div class="system-workspace">
+
+            <!-- =====================================================
+     TOP ACTION TABS
+     ===================================================== -->
+        <div class="workspace-grid">
+            <div class="top-action-tabs">
+
+                <button id="grammarBtn"
+                        class="top-action-tab active"
+                        onclick="runGrammarCheck()">
+                    <span class="tab-icon">✍️</span>
+                    <span>Check Grammar</span>
+                </button>
+
+                <button id="pdfBtn"
+                        class="top-action-tab"
+                        onclick="downloadPdfReport()">
+                    <span class="tab-icon">📄</span>
+                    <span>Download PDF Report</span>
+                </button>
+
+                <button class="top-action-tab"
+                        onclick="runSummarizer()">
+                    <span class="tab-icon">⚡</span>
+                    <span>Summarize Text</span>
+                </button>
+
+                <button class="top-action-tab"
+                        onclick="runAIDetection()">
+                    <span class="tab-icon">🤖</span>
+                    <span>Check AI Content</span>
+                </button>
+
+            </div>
+        </div>
+
+
+            <!-- =====================================================
+                 INPUT SECTION
+                 ===================================================== -->
+            <div class="panel plagiarism-input-panel">
+
+                <div class="segmented-control">
+
+                    <button
+                            class="segmented-btn active"
+                            data-tab="compare">
+
+                        Compare Two Texts
+
+                    </button>
+
+                    <button
+                            class="segmented-btn"
+                            data-tab="internet">
+
+                        Check Against Internet
+
+                    </button>
+
+                </div>
+
+
+                <div class="underline-tabs">
+
+                    <button
+                            class="tab-btn active"
+                            data-target="text-check">
+
+                        <span class="tab-icon">📝</span>
+                        Text Plagiarism Check
+
+                    </button>
+
+                    <button
+                            class="tab-btn"
+                            data-target="doc-check">
+
+                        <span class="tab-icon">📁</span>
+                        Document Plagiarism Check
+
+                    </button>
+
+                </div>
+
+
+                <!-- TEXT INPUTS -->
+                <div id="text-input-container">
+
+                    <div class="text-input-grid">
+
+                        <div class="text-input-box">
+
+                            <h4>Plagiarised Text</h4>
+
+                            <textarea
+                                    id="submissionInput"
+                                    placeholder="Type or paste target content here for comparison ..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <div
+                                id="source-text-container"
+                                class="text-input-box">
+
+                            <h4>Source Text</h4>
+
+                            <textarea
+                                    id="sourceInput"
+                                    placeholder="Enter source text..."
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DOCUMENT UPLOAD -->
+                <div
+                        id="document-input-container"
+                        class="document-upload-container"
+                        style="display:none;">
+
+                    <div class="upload-icon">📥</div>
+
+                    <p class="upload-main-text">
+                        Drag and drop your document here, or browse local files
+                    </p>
+
+                    <p class="upload-sub-text">
+                        Supports .txt, .pdf, and .docx files
+                    </p>
+
+                    <input
+                            type="file"
+                            id="documentFileInput"
+                            accept=".txt,.pdf,.docx"
+                            onchange="handleFileSelection()"
+                            style="display:none;">
+
+                    <button
+                            type="button"
+                            class="upload-file-btn"
+                            onclick="document.getElementById('documentFileInput').click()">
+
+                        Upload file 📤
+
+                    </button>
+
+                    <div id="fileStatusDisplay" class="file-status"></div>
+
+                </div>
+
+
+                <!-- EXCLUSION FILTERS -->
+                <div class="exclusion-filters">
+
+                    <div class="exclusion-title">
+                        🔧 SYSTEM EXCLUSION FILTERS
+                    </div>
+
+                    <div class="exclusion-options">
+
+                        <label>
+                            <input
+                                    type="checkbox"
+                                    id="excludeBib">
+                            Exclude Bibliography
+                        </label>
+
+                        <label>
+                            <input
+                                    type="checkbox"
+                                    id="excludeQuotes">
+                            Exclude Quotes
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VERIFY -->
+                <button
+                        class="btn-primary verify-btn"
+                        onclick="executeSelectedVerificationScan()">
+
+                    🔍 Verify
+
+                </button>
+
+
+                <!-- GRAMMAR RESULT -->
+                <div
+                        id="grammarResults"
+                        class="additional-result-box"
+                        style="display:none;">
+
+                    <h4>✍️ Grammar & Style Audit</h4>
+
+                    <div id="grammarList"
+                         class="additional-result-content">
+                    </div>
+
+                </div>
+
+
+                <!-- AI / SUMMARY RESULT -->
+                <div
+                        id="aiSummaryResults"
+                        class="additional-result-box"
+                        style="display:none;">
+
+                    <h4 id="aiSummaryTitle">
+                        Result
+                    </h4>
+
+                    <div
+                            id="aiSummaryContent"
+                            class="additional-result-content">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 COMPARISON RESULT
+                 ===================================================== -->
+
+            <div
+                    class="panel comparison-result-panel"
+                    id="results-panel">
+
+                <div class="gauge-box">
+
+                    <div class="severity-information">
+
+                        <h3>Plagiarism Severity</h3>
+
+                        <p id="severity-label">
+                            Content mapping shown here.
+                        </p>
+
+                    </div>
+
+                    <div
+                            class="score-circle"
+                            id="percentageCircle">
+
+                        0%
+
+                    </div>
+
+                </div>
+
+
+                <!-- WEB CITATIONS -->
+                <div
+                        id="sources-container"
+                        class="sources-container">
+
+                    <div class="sources-title">
+                        🌐 IDENTIFIED WEB CITATIONS
+                    </div>
+
+                    <div
+                            id="citation-list"
+                            class="citation-container">
+
+                <span>
+                    Run a verification scan to detect web citations.
+                </span>
+
+                    </div>
+
+                </div>
+
+
+                <h3 class="mapping-heading">
+                    Side-by-Side Verification Mapping
+                </h3>
+
+
+                <div class="comparison-container">
+
+                    <div class="comparison-column">
+
+                        <div class="comparison-label">
+                            SUBMITTED CORE
+                        </div>
+
+                        <div
+                                class="view-pane"
+                                id="submittedPane">
+
+                            Awaiting comparison trace...
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="comparison-column">
+
+                        <div
+                                class="comparison-label"
+                                id="sourcePaneHeader">
+
+                            IDENTIFIED MATCH RESOURCE
+
+                        </div>
+
+                        <div
+                                class="view-pane"
+                                id="sourcePane">
+
+                            Awaiting comparison trace...
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REPORT SECTION -->
+                <div class="report-container">
+                    <div class="report-header">
+                        <span class="report-title">DETAILED VERIFICATION REPORT</span>
+                        <button id="downloadPdfBtn" class="btn-download" style="display: none;">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </button>
+                    </div>
+
+                    <div id="reportContent" class="report-body">
+                        <p class="placeholder-text">Awaiting report generation...</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- WHITE MARKETING FOOTPRINT -->
+        <section style="max-width: 1200px; margin: 100px auto 40px auto; padding: 0 20px; font-family: system-ui, -apple-system, sans-serif;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="font-size: 2.2rem; color: #0f172a; margin-bottom: 10px; font-weight: 700;">Go beyond basic plagiarism check</h2>
+                <p style="color: #64748b; font-size: 1.1rem; margin: 0;">See not just a score. Get a full breakdown of what was flagged, where it came from, and how to fix it.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                    <div style="height: 180px; background: #f8fafc; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #f1f5f9;">
+                        <div style="width: 80%; background: #ffffff; padding: 15px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center;">
+                            <div style="width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#ef4444 0% 50%, #f59e0b 50% 75%, #3b82f6 75% 90%, #10b981 90% 100%);"></div>
+                            <div style="font-size: 11px; flex-grow: 1; color: #475569;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>🔴 Identical</span><strong>50%</strong></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>🟡 Minor changes</span><strong>25%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>🔵 Paraphrased</span><strong>15%</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 style="font-size: 1.3rem; color: #0f172a; margin: 0 0 12px 0; font-weight: 600;">Know exactly what's flagged</h3>
+                    <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6; margin: 0;">Every flagged sentence is highlighted and linked directly to the matching source. You see what was copied, what was paraphrased, and where it originally appeared.</p>
+                </div>
+
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                    <div style="height: 180px; background: #f8fafc; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #f1f5f9;">
+                        <div style="width: 75%; background: #ffffff; padding: 15px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border-left: 4px solid #2563eb;">
+                            <div style="font-size: 12px; font-weight: bold; color: #1e293b; margin-bottom: 4px;">🔍 15% Plagiarism</div>
+                            <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Your text matches 4 external sources</div>
+                            <div style="display: inline-block; background: #2563eb; color: white; font-size: 11px; padding: 6px 12px; border-radius: 6px; font-weight: 500;">✨ Remove Plagiarism</div>
+                        </div>
+                    </div>
+                    <h3 style="font-size: 1.3rem; color: #0f172a; margin: 0 0 12px 0; font-weight: 600;">Fix it without switching tools</h3>
+                    <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6; margin: 0;">Found a problem? Rewrite flagged sections directly in the editor. No copying text into another tab, no back-and-forth. Detection and revision happen in the same place.</p>
+                </div>
+            </div>
+
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; align-items: center;">
+                <div style="background: #f8fafc; border-radius: 12px; padding: 24px; border: 1px solid #f1f5f9; position: relative;">
+                    <div style="background: white; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 280px; margin: 0 auto;">
+                        <div style="font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 12px; display:flex; justify-content:space-between;"><span>Smart settings</span><span>✕</span></div>
+                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px; color: #475569;">
+                            <div style="display: flex; justify-content: space-between;"><span>Citations</span><span style="color:#2563eb;">🔵</span></div>
+                            <div style="display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 8px;"><span>Quotes</span><span style="color:#cbd5e1;">⚪</span></div>
+                            <div style="display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 8px;"><span>Bibliographies</span><span style="color:#2563eb;">🔵</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size: 1.4rem; color: #0f172a; margin: 0 0 12px 0; font-weight: 600;">Precise detection, smart exclusions</h3>
+                    <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6; margin: 0;">Properly cited quotes, bibliographies, and reference lists are automatically excluded from your plagiarism score. What you see reflects your original writing, not references.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer style="background: #005f54; color: #ffffff; padding: 60px 20px 30px 20px; font-family: system-ui, -apple-system, sans-serif; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 60px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+
+                <div style="text-align: center; margin-bottom: 50px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px;">
+                    <h2 style="font-size: 2rem; margin: 0 0 12px 0; font-weight: bold;">Make your writing best-in-class</h2>
+                    <p style="color: rgba(255,255,255,0.8); margin: 0 0 20px 0; font-size: 1rem;">Join users who rely on our verification system to transform their workflows daily.</p>
+                    <button style="background: #ffffff; color: #005f54; border: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">Get Started — It's free →</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-bottom: 40px;">
+                    <div>
+                        <h4 style="font-size: 14px; text-transform: uppercase; margin: 0 0 16px 0; color: rgba(255,255,255,0.6); letter-spacing: 0.05em;">Get Started</h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">Online Website</a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 14px; text-transform: uppercase; margin: 0 0 16px 0; color: rgba(255,255,255,0.6); letter-spacing: 0.05em;">Learn More</h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">Education Modules</a>
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">API Reference</a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 14px; text-transform: uppercase; margin: 0 0 16px 0; color: rgba(255,255,255,0.6); letter-spacing: 0.05em;">Features</h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">Plagiarism Checker</a>
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">AI Content Detector</a>
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">Grammar Diagnostics</a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 14px; text-transform: uppercase; margin: 0 0 16px 0; color: rgba(255,255,255,0.6); letter-spacing: 0.05em;">Connect</h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">Help Support Center</a>
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">Contact Us</a>
+                            <a href="#" style="color: #ffffff; text-decoration: none; opacity: 0.85;">Github</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: rgba(255,255,255,0.6);">
+                    <div style="font-weight: bold; color: #ffffff;">🛡️ Web-Based Plagiarism Detector</div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+
+    <!-- 📁 SECTION: HISTORY -->
+    <div id="history-view" class="tab-layer hidden" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; margin-top: 10px; min-height: 400px; display: none;">
+        <h2 style="color: #0f172a; margin-top: 0;">📁 History</h2>
+        <p style="color: #64748b; margin-bottom: 20px;">Review past plagiarism detection logs compiled in this workspace.</p>
+
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+            <tr style="border-bottom: 2px solid #cbd5e1; color: #475569;">
+                <th style="padding: 10px;">Timestamp</th>
+                <th style="padding: 10px;">Document / Text Snip</th>
+                <th style="padding: 10px;">Match Percentage</th>
+                <th style="padding: 10px;">Status</th>
+            </tr>
+            </thead>
+            <!-- 🎯 TARGET CONTAINER FOR SCRIPT.JS DOM INJECTION -->
+            <tbody id="history-table-body">
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">
+                    Loading backend database records...
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ℹ️ SECTION: ABOUT US (CREATORS) -->
+    <div id="about-view" class="tab-layer hidden" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; margin-top: 10px; min-height: 400px; display: none;">
+        <h2 style="color: #0f172a; margin-top: 0;">ℹ️ About Us (Creators)</h2>
+        <p style="color: #64748b;">This software was meticulously prototyped and refined by the development engineering team:</p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">
+            <div style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; text-align: center; background: #f8fafc;">
+                <div style="font-size: 24px; margin-bottom: 10px;">💻</div>
+                <strong>Riya Pednekar</strong><br><span style="font-size: 12px; color: #64748b;">FS24CO004</span>
+            </div>
+            <div style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; text-align: center; background: #f8fafc;">
+                <div style="font-size: 24px; margin-bottom: 10px;">🛡️</div>
+                <strong>Diksha Pokle</strong><br><span style="font-size: 12px; color: #64748b;">FS24CO029</span>
+            </div>
+            <div style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; text-align: center; background: #f8fafc;">
+                <div style="font-size: 24px; margin-bottom: 10px;">🚀</div>
+                <strong>Pragati Bhosale</strong><br><span style="font-size: 12px; color: #64748b;">FW23CO003</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ❓ SECTION: HELP & SYSTEM FAQs -->
+    <div id="help-view" class="tab-layer hidden" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; margin-top: 10px; min-height: 400px; display: none;">
+        <h2 style="color: #0f172a; margin-top: 0;">❓ Help & System FAQs</h2>
+        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+            <div>
+                <h4 style="margin: 0 0 5px 0; color: #1e293b;">How accurate is the plagiarism scan engine?</h4>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">The layout processes programmatic token hashes side-by-side to ensure precise validation checks matching identical and modified prose segments instantly.</p>
+            </div>
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <h4 style="margin: 0 0 5px 0; color: #1e293b;">Which file formats are supported for plagiarism scanning?</h4>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">We currently support plain text files (.txt). For best results with Microsoft Word (.docx) or PDF documents, simply copy the text directly and paste it into the Text Scan tab.</p>
+            </div>
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                <h4 style="margin: 0 0 5px 0; color: #1e293b;">Is my search history saved?</h4>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">Yes. All completed scans are automatically logged to your identity session. You can view all previous scan dates, document names, similarity scores, and status updates anytime under the History tab.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📞 SECTION: CONTACT US SUPPORT -->
+    <div id="contact-view" class="tab-layer hidden" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; margin-top: 10px; min-height: 400px; display: none;">
+        <h2 style="color: #0f172a; margin-top: 0;">📞 Contact Us Support</h2>
+        <p style="color: #64748b; margin-bottom: 25px;">Experiencing technical issues inside the workspace environment? Reach our team directly.</p>
+        <div style="max-width: 450px;">
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; font-size:12px; font-weight:600; color:#475569; margin-bottom:4px;">Inquiry Subject</label>
+                <input type="text" placeholder="e.g. Issue regarding upload" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-size:12px; font-weight:600; color:#475569; margin-bottom:4px;">Message Context</label>
+                <textarea placeholder="Describe your workspace issue details..." style="width:100%; height:100px; padding:10px; border:1px solid #cbd5e1; border-radius:6px; resize:none;"></textarea>
+            </div>
+            <button class="btn-primary" style="background:#2563eb; padding:10px 20px; border-radius:6px; border:none; color:white; font-weight:bold; cursor:pointer;" onclick="alert('Submitted Successfully!')">Submit</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
